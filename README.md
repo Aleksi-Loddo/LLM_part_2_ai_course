@@ -80,7 +80,7 @@ The application uses a decoupled architecture to support real-time streaming of 
 ## ⚠️ Known Limitations
 * **In-Memory Rate Limiting:** The rate limiter resets on server restart and is specific to local memory; it would need Redis for distributed production use.
 * **Hardcoded Assets:** The ingredient list and traits are currently hardcoded in the frontend.
-* **Schema Rigidity:** The system currently relies on simple string-based ingredient names to maintain stability across different Gemini API versions. Re-introducing complex ingredient objects (traits/flavors) requires careful Pydantic re-mapping to prevent 422 errors.
+* **Schema Rigidity:** The system currently relies on simple string-based ingredient names to maintain stability across different Gemini API versions. Re-introducing complex ingredient objects (traits/flavors) requires careful Pydantic re-mapping to prevent errors.
 * **Prompt Injection:** Highly creative ingredient names could potentially bypass the system prompt's persona constraints.
 
 ---
