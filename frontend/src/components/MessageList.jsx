@@ -31,7 +31,7 @@ export default function MessageList({ messages, isStreaming }) {
             </div>
           </div>
         ))}
-        {/* Invisible element that we scroll into view */}
+        {}
         <div ref={messagesEndRef} />
       </div>
     </div>

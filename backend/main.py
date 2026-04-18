@@ -55,10 +55,6 @@ FORMAT YOUR RESPONSE IN MARKDOWN:
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash-lite", system_instruction=SYSTEM_PROMPT)
-#gemini-2.5-flash-lite
-#gemini-2.5-pro
-#gemini-3-flash
-#gemini-1.5-flash
 app = FastAPI(title="Eldritch Grimoire API")
 
 app.add_middleware(
@@ -115,7 +111,7 @@ async def brew_stream(request: BrewRequest):
     
     def generate():
         try:
-            # Simple string access
+           
             ing1 = request.ingredients[0]
             ing2 = request.ingredients[1]
 
@@ -131,7 +127,7 @@ async def brew_stream(request: BrewRequest):
                     event = json.dumps({"type": "text", "content": chunk.text})
                     yield f"data: {event}\n\n"
 
-            # Simplified Done Event
+          
             usage = response.usage_metadata
             done_event = json.dumps({
                 "type": "done",
