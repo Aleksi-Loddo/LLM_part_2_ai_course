@@ -1,198 +1,92 @@
-# Day 9 — LLM Web App Integration
+# 📖 Sentient Eldritch Grimoire
 
-A full-stack chat application that streams responses from the Gemini API in real time. The backend is a FastAPI server that proxies requests to Gemini; the frontend is a React app built with Vite.
+A real-time, alchemical spell-crafting application where users combine mystical ingredients to receive generated spells from an ancient, malevolent book.
 
----
+## 🌑 Project Description
+The **Sentient Eldritch Grimoire** is a web-based playground where users act as acolytes to an ancient entity. By selecting two mystical ingredients (e.g., "Void Salt" and "Obsidian Tongue"), users initiate a ritual that synthesizes these items into a dark spell. 
 
-## Architecture
-
-```
-Browser (React + Vite)
-        │
-        │  POST /chat  (non-streaming)
-        │  POST /chat/stream  (SSE streaming)
-        ▼
-FastAPI Backend  (localhost:8000)
-        │
-        │  google.generativeai
-        ▼
-Gemini API  (gemini-2.5-flash-lite)
-```
-
-The backend exists for two reasons:
-1. **API key security** — the Gemini key never leaves the server.
-2. **Rate limiting** — the backend enforces a per-session request cap before forwarding to Gemini.
+The Grimoire features a dynamic **Sanity System**:
+- **High Sanity (100-70%):** The book is a cold, scholarly curator.
+- **Medium Sanity (69-31%):** The book becomes mocking and cryptic.
+- **Low Sanity (30-0%):** The book turns feral, using ALL CAPS and stuttering text as the user's mind decays.
 
 ---
 
-## How the application works
+## 🏗️ Architecture Overview
+The application uses a decoupled architecture to support real-time streaming of AI responses:
 
-### Conversation history
+* **Frontend:** React (Vite) manages the UI, sanity state, and handles the **Server-Sent Events (SSE)** stream to display the Grimoire's incantations word-by-word.
+* **Backend:** FastAPI (Python) acts as a secure proxy, managing rate limits, session history, and the connection to the Google AI SDK.
+* **LLM Provider:** Google Gemini API (`gemini-2.5-flash-lite`) generates the narrative content and spell logic.
 
-The frontend maintains the full conversation in React state as a list of messages:
-
-```js
-[
-  { role: 'user',      content: 'Hello!' },
-  { role: 'assistant', content: 'Hi there!' },
-  ...
-]
-```
-
-Before every request, the frontend converts this list into the Gemini wire format (role `"assistant"` → `"model"`, `content` → `parts`) and sends the entire history to the backend. The backend builds a `contents` list from the received history plus the new user message and passes it to `model.generate_content()`. **There is no server-side session state** — the client is the single source of truth for history.
-
-### Streaming toggle
-
-The UI has a **Streaming** checkbox. Both modes hit the same Gemini model but use different endpoints and response handling:
-
-| Mode | Endpoint | Response type |
-|------|----------|---------------|
-| On (default) | `POST /chat/stream` | Server-Sent Events (SSE) over `fetch` + `ReadableStream` |
-| Off | `POST /chat` | Regular JSON response |
-
-### Why `fetch` + `ReadableStream` instead of `EventSource`?
-
-`EventSource` is the standard browser API for SSE — but it only supports `GET` requests. Because this app needs to send a JSON body (the message and history), it uses `fetch` with `response.body.getReader()` to consume the SSE stream manually over a `POST` request.
-
-### Token usage and cost
-
-After every response (streaming and non-streaming) the backend returns token counts and an estimated cost. These are displayed in the usage bar beneath the header.
+**Flow:** `React Client` ➔ `FastAPI Proxy` ➔ `Gemini API` (Stream) ➔ `React UI`
 
 ---
 
-## Communication protocol
-
-### Non-streaming — `POST /chat`
-
-**Request body:**
-
-```json
-{
-  "message": "What is the capital of France?",
-  "history": [
-    { "role": "user",  "parts": [{ "text": "Hello!" }] },
-    { "role": "model", "parts": [{ "text": "Hi! How can I help?" }] }
-  ],
-  "session_id": "session-abc123"
-}
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `message` | string | The new user message to send |
-| `history` | array | Prior turns in Gemini format (may be empty `[]`) |
-| `session_id` | string | Identifies the browser tab for rate limiting |
-
-**Response body:**
-
-```json
-{
-  "response": "The capital of France is Paris.",
-  "usage": {
-    "input_tokens": 42,
-    "output_tokens": 9,
-    "estimated_cost_usd": 0.000008
-  }
-}
-```
+## 🛠️ Technical Choices
+* **FastAPI:** Chosen for its superior handling of asynchronous `StreamingResponse` objects, which is critical for low-latency AI feedback.
+* **Pydantic:** Utilized for strict data validation at the API entry point to ensure ingredient payloads match the expected schema.
+* **SSE (Server-Sent Events):** Selected over WebSockets for its simplicity and efficiency in one-way server-to-client text streaming.
+* **Gemini 2.5 Flash Lite:** Used for its high-speed performance and ability to strictly adhere to complex "Logic Rules" regarding spell synthesis and persona shifts.
 
 ---
 
-### Streaming — `POST /chat/stream`
+## 🚀 Setup and Running Instructions
 
-The request body is identical to `/chat`.
+### 1. Prerequisites
+* Python 3.10+
+* Node.js 18+
+* Google AI (Gemini) API Key
 
-The response is a stream of Server-Sent Events with `Content-Type: text/event-stream`. Each event is a JSON object on a `data:` line, terminated by a blank line:
+### 2. Backend Setup
+1.  **Environment Variables:** Create a `.env` file in the root of the `/backend` folder:
+    ```env
+    GEMINI_API_KEY=your_key_here
+    ```
+2.  **Navigate and Initialize:**
+    ```bash
+    cd backend
+    python -m venv venv
+    ```
+3.  **Activate Virtual Environment:**
+    - **Windows:** `venv\Scripts\activate`
+    - **Linux/Mac:** `source venv/bin/activate`
+4.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+5.  **Run Server:**
+    ```bash
+    uvicorn main:app --reload
+    ```
 
-```
-data: {"type": "text", "content": "The capital"}\n\n
-data: {"type": "text", "content": " of France"}\n\n
-data: {"type": "text", "content": " is Paris."}\n\n
-data: {"type": "done", "usage": {"input_tokens": 42, "output_tokens": 9, "estimated_cost_usd": 0.000008}}\n\n
-```
-
-| Event type | Payload | When sent |
-|------------|---------|-----------|
-| `text` | `{ "type": "text", "content": "<token(s)>" }` | Once per chunk as Gemini generates tokens |
-| `done` | `{ "type": "done", "usage": { ... } }` | Once, after the last token |
-
-The frontend accumulates `text` chunks into the assistant message in real time and reads the `done` event to update the usage bar.
-
----
-
-### Rate limiting
-
-Each `session_id` is limited to **20 requests per 60 seconds** (in-memory, resets on server restart). Exceeding the limit returns:
-
-```
-HTTP 429  {"detail": "Rate limit exceeded. Try again in a moment."}
-```
-
----
-
-## Setup
-
-### Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- A [Gemini API key](https://aistudio.google.com/app/apikey)
-
-### 1. Backend
-
-```bash
-cd 9-web-app-integration
-
-# Copy and fill in the environment file
-cp .env.example .env
-# Edit .env and set GEMINI_API_KEY=<your key>
-
-# Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install -r backend/requirements.txt
-
-# Start the server
-uvicorn backend.main:app --reload
-```
-
-The API is now running at `http://localhost:8000`. Open `http://localhost:8000/health` to verify.
-
-### 2. Frontend
-
-In a second terminal:
-
-```bash
-cd 9-web-app-integration/frontend
-
-npm install
-npm run dev
-```
-
-The app opens at `http://localhost:5173`.
+### 3. Frontend Setup
+1.  **Navigate:**
+    ```bash
+    cd frontend
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Start Development Server:**
+    ```bash
+    npm run dev
+    ```
+4.  **Access App:** Open `http://localhost:5173` in your browser.
 
 ---
 
-## Project structure
+## ⚠️ Known Limitations
+* **In-Memory Rate Limiting:** The rate limiter resets on server restart and is specific to local memory; it would need Redis for distributed production use.
+* **Hardcoded Assets:** The ingredient list and traits are currently hardcoded in the frontend.
+* **Schema Rigidity:** The system currently relies on simple string-based ingredient names to maintain stability across different Gemini API versions. Re-introducing complex ingredient objects (traits/flavors) requires careful Pydantic re-mapping to prevent 422 errors.
+* **Prompt Injection:** Highly creative ingredient names could potentially bypass the system prompt's persona constraints.
 
-```
-9-web-app-integration/
-├── .env.example              # Environment variable template
-├── backend/
-│   ├── main.py               # FastAPI app — /chat and /chat/stream endpoints
-│   └── requirements.txt      # Python dependencies
-└── frontend/
-    ├── index.html
-    ├── package.json
-    ├── vite.config.js
-    └── src/
-        ├── App.jsx               # Root component — state, fetch logic, streaming
-        ├── main.jsx
-        ├── index.css
-        └── components/
-            ├── ChatInput.jsx     # Textarea + send button
-            ├── MessageList.jsx   # Renders the conversation bubbles
-            └── UsageBar.jsx      # Token count and cost display
-```
+---
+
+## 🤖 AI Tools Used
+* **Gemini 3 Flash:** Served as the lead debugger and architectural consultant.
+    * Assisted in synchronizing Pydantic models with React state to resolve `422 Unprocessable Entity` errors.
+    * Provided troubleshooting for model-name mismatches (`404 Not Found`) across different API versions.
+    * Optimized the SSE stream buffer logic to prevent unexpected connection terminations.
