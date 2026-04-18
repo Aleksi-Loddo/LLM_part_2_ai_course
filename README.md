@@ -8,7 +8,7 @@ The **Sentient Eldritch Grimoire** is a web-based playground where users act as 
 The Grimoire features a dynamic **Sanity System**:
 - **High Sanity (100-70%):** The book is a cold, scholarly curator.
 - **Medium Sanity (69-31%):** The book becomes mocking and cryptic.
-- **Low Sanity (30-0%):** The book turns feral, using ALL CAPS and stuttering text as the user's mind decays.
+- **Low Sanity (30-0%):** The book turns feral, using a mix of Caps and small lettersand stuttering text as the user's mind decays.
 
 ---
 
