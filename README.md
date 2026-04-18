@@ -3,7 +3,7 @@
 A real-time, alchemical spell-crafting application where users combine mystical ingredients to receive generated spells from an ancient, malevolent book.
 
 ## 🌑 Project Description
-The **Sentient Eldritch Grimoire** is a web-based playground where users act as acolytes to an ancient entity. By selecting two mystical ingredients (e.g., "Void Salt" and "Obsidian Tongue"), users initiate a ritual that synthesizes these items into a dark spell. 
+The **Sentient Eldritch Grimoire** is a web-based playground where users act as acolytes to an ancient entity. By selecting two mystical ingredients (e.g., "Void Salt" and "Obsidian Tongue"), users initiate a ritual that synthesizes these items into a dark spell.
 
 The Grimoire features a dynamic **Sanity System**:
 - **High Sanity (100-70%):** The book is a cold, scholarly curator.
