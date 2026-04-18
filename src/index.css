@@ -1,0 +1,78 @@
+/* Eldritch specific styles */
+.eldritch-font {
+  font-family: 'Georgia', serif;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(79, 156, 249, 0.4);
+}
+
+.sanity-container {
+  width: 200px;
+  font-size: 12px;
+}
+
+.sanity-bar-bg {
+  height: 8px;
+  background: #111;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.sanity-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.5s ease, background 0.5s;
+}
+
+/* Low sanity visual effects */
+.sanity-20 .sanity-bar-fill { background: var(--error); }
+.sanity-20 .app { filter: contrast(1.1) brightness(0.9) sepia(0.2); }
+.sanity-0 .message-content { animation: jitter 0.1s infinite; }
+
+@keyframes jitter {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(1px, -1px); }
+  100% { transform: translate(-1px, 1px); }
+}
+
+.ritual-area {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.ing-btn {
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.ing-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(79, 156, 249, 0.1);
+}
+
+.btn-brew {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+
+.btn-brew:disabled { opacity: 0.3; }

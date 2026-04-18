@@ -1,0 +1,193 @@
+/* --- Global Reset --- */
+:root {
+  --bg: #05050a;           /* Near black-blue */
+  --surface: #120d1d;      /* Deep purple-grey */
+  --border: #3d2b56;       /* Faded violet border */
+  --text: #e0d7ee;         /* Soft lavender text */
+  --accent: #9d50bb;       /* Bright purple */
+  --accent-glow: #6e48aa;  /* Indigo glow */
+  --user-bg: #1a1429;
+  --error: #ff4bb4;        /* Hot pink for errors */
+  --radius: 8px;
+}
+
+body {
+  background-color: var(--bg) !important; /* Force dark background */
+  color: var(--text);
+  font-family: 'Georgia', serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Main App Layout --- */
+.app {
+  width: 100%;
+  max-width: 900px;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+/* Adds a breathing animation to the app */
+.app {
+  animation: void-pulse 10s ease-in-out infinite;
+  background: radial-gradient(circle at center, #120d1d 0%, #05050a 100%);
+}
+
+@keyframes void-pulse {
+  0%, 100% { box-shadow: inset 0 0 50px #000; }
+  50% { box-shadow: inset 0 0 100px #1a0b2e; }
+}
+
+/* --- Header & Sanity --- */
+.header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+
+.eldritch-font {
+  color: #d1b3ff;
+  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.sanity-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sanity-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #563d7c, var(--accent));
+  transition: width 0.8s ease-in-out;
+}
+
+/* --- Ritual/Ingredient Area --- */
+.ritual-area {
+  background: var(--surface);
+  padding: 25px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.ing-btn.active {
+  background: var(--accent);
+  border-color: #f3e5f5;
+  box-shadow: 0 0 20px var(--accent), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.ing-btn:hover {
+  border-color: var(--accent);
+  color: white;
+}
+
+.ing-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: white;
+  box-shadow: 0 0 15px rgba(136, 96, 208, 0.4);
+}
+
+.btn-brew {
+  background: linear-gradient(45deg, #6e48aa, #9d50bb);
+  color: white;
+  border: 1px solid #d1b3ff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+}
+
+.btn-brew:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* --- Message Bubbles --- */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.message {
+  padding: 15px;
+  border-radius: var(--radius);
+  line-height: 1.6;
+}
+
+.message.user {
+  background: var(--user-bg);
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.message.assistant {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.message-label {
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+  display: block;
+  color: var(--accent);
+}
+
+/* --- Usage Bar --- */
+.usage-bar {
+  font-size: 0.8rem;
+  color: #8b949e;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.message-content {
+  max-width: 85%;
+  padding: 15px;
+  border-radius: var(--radius);
+  line-height: 1.8; /* Improves readability */
+  font-size: 1rem;
+  
+  /* THIS LINE IS THE FIX */
+  white-space: pre-wrap; 
+  
+  /* OPTIONAL: Makes the headers stand out more if you use bold */
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* Optional: Make bold text look like glowing ink */
+.message-content strong, 
+.message-content b {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ing-trait {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-top: 4px;
+}
